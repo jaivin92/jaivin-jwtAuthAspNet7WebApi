@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using jwtAuthAspNet7WebApi.Core.Dtos;
+using jwtAuthAspNet7WebApi.Core.Entities;
 using jwtAuthAspNet7WebApi.Core.OtherObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,11 +15,11 @@ namespace jwtAuthAspNet7WebApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -57,8 +58,10 @@ namespace jwtAuthAspNet7WebApi.Controllers
             if (isExistsUser != null)
                 return BadRequest("User Already Exists");
 
-            IdentityUser newUser = new IdentityUser()
+            ApplicationUser newUser = new ApplicationUser()
             {
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.UserName,
                 SecurityStamp = Guid.NewGuid().ToString(),
@@ -103,12 +106,14 @@ namespace jwtAuthAspNet7WebApi.Controllers
                 return Unauthorized("Invalid Credentials");
 
             var userRoles = await _userManager.GetRolesAsync(user);
-
+            //generate 256 token and data response convert in byt code to json  jwt toek online
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim("JWTID", Guid.NewGuid().ToString()),
+                new Claim("FirstName", user.FirstName),
+                new Claim("LastName", user.LastName),
             };
 
             foreach(var userRole in userRoles) 
