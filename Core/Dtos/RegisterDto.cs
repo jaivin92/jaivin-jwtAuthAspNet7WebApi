@@ -4,6 +4,12 @@ namespace jwtAuthAspNet7WebApi.Core.Dtos
 {
     public class RegisterDto
     {
+        [Required(ErrorMessage = "FirstName is Required")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "LastName is Required")]
+        public string LastName { get; set; }
+
         [Required(ErrorMessage ="UserName is Required")]
         public string UserName {get;  set;}
 
